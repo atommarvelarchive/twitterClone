@@ -178,7 +178,7 @@ public class Tweet extends Model {
   }
 
   public static ArrayList<Tweet> fromJson(JSONArray jsonArray) {
-    ArrayList<Tweet> tweets = new ArrayList<Tweet>(jsonArray.length());
+    ArrayList<Tweet> twitterTweets = new ArrayList<Tweet>(jsonArray.length());
 
     for (int i=0; i < jsonArray.length(); i++) {
         JSONObject tweetJson = null;
@@ -189,12 +189,12 @@ public class Tweet extends Model {
             continue;
         }
 
-        Tweet tweet = new Tweet(tweetJson);
-        tweet.save();
-        tweets.add(tweet);
+        Tweet twitterTweet = new Tweet(tweetJson);
+        twitterTweet.save();
+        twitterTweets.add(twitterTweet);
     }
 
-    return tweets;
+    return twitterTweets;
   }
 }
 ```
@@ -231,7 +231,7 @@ client.getHomeTimeline(1, new JsonHttpResponseHandler() {
 You can then load the data into your models from a `JSONArray` using:
 
 ```java
-ArrayList<Tweet> tweets = Tweet.fromJSON(jsonArray);
+ArrayList<Tweet> twitterTweets = Tweet.fromJSON(jsonArray);
 ```
 
 or load the data from a single `JSONObject` with:
