@@ -1,4 +1,4 @@
-package com.codepath.apps.twitterClone.activities;
+package com.codepath.apps.twitterClone.ui;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.codepath.apps.twitterClone.MainApplication;
 import com.codepath.apps.twitterClone.R;
 import com.codepath.apps.twitterClone.models.TwitterTweet;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
@@ -46,7 +45,7 @@ public class ComposeTweetActivity extends AppCompatActivity {
                             Intent data = new Intent();
 
                             // Pass relevant data back as a result
-                            data.putExtra(HomeActivity.EXTRA_TWEET, tweet);
+                            data.putExtra(TweetsFragment.EXTRA_TWEET, tweet);
                             // Activity finished ok, return the data
                             setResult(RESULT_OK, data); // set result code and bundle data for response
                             finish(); // closes the activity, pass data to parent

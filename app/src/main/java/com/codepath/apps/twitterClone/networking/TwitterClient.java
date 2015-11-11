@@ -8,7 +8,10 @@ import android.content.Context;
 
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import java.util.HashMap;
 
 /*
  * 
@@ -35,21 +38,34 @@ public class TwitterClient extends OAuthBaseClient {
 
 	public void getHomeTimeline(int page, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
-		RequestParams params = getAuthParams();
+		RequestParams params = new RequestParams();
 		params.put("page", String.valueOf(page));
 		getClient().get(apiUrl, params, handler);
 	}
 
     public void postTweet(String body, AsyncHttpResponseHandler handler) {
         String apiUrl = getApiUrl("statuses/update.json");
-        RequestParams params = getAuthParams();
+        RequestParams params = new RequestParams();
         params.put("status", body);
         getClient().post(apiUrl, params, handler);
     }
 
-    public RequestParams getAuthParams() {
-        RequestParams params = new RequestParams();
-        return params;
+	public void getTweetsFromSource(String src, int page, RequestParams srcParams, JsonHttpResponseHandler handler) {
+        RequestParams params = srcParams == null ?  new RequestParams() : srcParams;
+        params.put("page", String.valueOf(page));
+        getClient().get(src, params, handler);
+	}
+
+	public String getHomeTimelineUrl() {
+		return getApiUrl("statuses/home_timeline.json");
+	}
+
+    public String getMentionsUrl() {
+        return getApiUrl("statuses/mentions_timeline.json");
+    }
+
+    public String getUserTimeLineUrl() {
+        return getApiUrl("statuses/user_timeline.json");
     }
 
 

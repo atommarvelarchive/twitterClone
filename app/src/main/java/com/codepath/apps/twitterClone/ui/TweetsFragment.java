@@ -1,21 +1,24 @@
-package com.codepath.apps.twitterClone.activities;
+package com.codepath.apps.twitterClone.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.codepath.apps.twitterClone.MainApplication;
 import com.codepath.apps.twitterClone.R;
 import com.codepath.apps.twitterClone.adapters.EndlessScrollListener;
 import com.codepath.apps.twitterClone.adapters.TwitterTweetsAdapter;
 import com.codepath.apps.twitterClone.models.TwitterTweet;
+import com.codepath.apps.twitterClone.models.TwitterUser;
 import com.codepath.apps.twitterClone.networking.TwitterClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -23,14 +26,19 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
+/**
+ * Created by araiff on 11/11/15.
+ */
+public class TweetsFragment extends Fragment {
+
     public static final int REQUEST_CODE = 20;
     public static final String EXTRA_TWEET = "tweetData";
-
     private RecyclerView rvTweets;
     private TwitterTweetsAdapter adapter;
     private List<TwitterTweet> mTweets;
     private LinearLayoutManager mManager;
+    private String mSource;
+    private TwitterUser mUser;
 
     private JsonHttpResponseHandler handler = new JsonHttpResponseHandler() {
         public void onSuccess(int statusCode, Header[] headers, JSONArray jsonArray) {
@@ -45,49 +53,42 @@ public class HomeActivity extends AppCompatActivity {
         }
     };
 
+    public static TweetsFragment newInstance(String src, TwitterUser user) {
+
+        TweetsFragment fragment = new TweetsFragment();
+        fragment.mSource = src;
+        fragment.mUser = user;
+        return fragment;
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_tweets, container, false);
+        initUI(view);
         TwitterClient client = MainApplication.getTwitterClient();
-        initUI();
-        client.getHomeTimeline(1, handler);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.miCompose) {
-            Intent intent = new Intent(this, ComposeTweetActivity.class);
-            startActivityForResult(intent, REQUEST_CODE);
-            return true;
+        RequestParams params = new RequestParams();
+        if (mUser != null) {
+            params.put("screen_name", mUser.screenName);
         }
-
-        return super.onOptionsItemSelected(item);
+        client.getTweetsFromSource(mSource, 1, params, handler);
+        return view;
     }
 
-    private void initUI() {
-        mManager =  new LinearLayoutManager(this);
+    private void initUI(View view) {
+        mManager =  new LinearLayoutManager(view.getContext());
         mTweets = new ArrayList<>();
-        rvTweets = (RecyclerView) findViewById(R.id.rvTweets);
+        rvTweets = (RecyclerView) view.findViewById(R.id.rvTweets);
         rvTweets.setLayoutManager(mManager);
         rvTweets.addOnScrollListener(new EndlessScrollListener(mManager) {
             @Override
             public void onLoadMore(int current_page) {
                 TwitterClient client = MainApplication.getTwitterClient();
-                client.getHomeTimeline(current_page, handler);
+                RequestParams params = new RequestParams();
+                if (mUser != null) {
+                    params.put("screen_name", mUser.screenName);
+                }
+                client.getTweetsFromSource(mSource, current_page, params, handler);
             }
         });
         adapter = new TwitterTweetsAdapter(mTweets);
@@ -104,16 +105,5 @@ public class HomeActivity extends AppCompatActivity {
         adapter.notifyItemInserted(0);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // REQUEST_CODE is defined above
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-            // Extract name value from result extras
-            TwitterTweet tweet = (TwitterTweet) data.getExtras().getSerializable(EXTRA_TWEET);
-            prependTweet(tweet);
-            mManager.scrollToPosition(0);
-            // Toast the name to display temporarily on screen
-            //Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
-        }
-    }
+
 }

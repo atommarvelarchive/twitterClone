@@ -1,4 +1,4 @@
-package com.codepath.apps.twitterClone.activities;
+package com.codepath.apps.twitterClone.ui;
 
 import android.content.Intent;
 import android.os.Bundle;

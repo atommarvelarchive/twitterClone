@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.codepath.apps.twitterClone.activities.HomeActivity">
+    tools:context="com.codepath.apps.twitterClone.ui.HomeActivity">
     <item android:id="@+id/miCompose"
         android:title="Compose"
         app:showAsAction="always"
